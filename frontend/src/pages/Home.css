@@ -1,0 +1,14 @@
+.recent-uploads-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 1rem;
+}
+
+.recent-uploads-scroll .card {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.dropdown-toggle {
+    width: 100%;
+}
