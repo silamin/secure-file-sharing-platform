@@ -37,6 +37,7 @@ In the current digital era, secure file sharing is essential for both personal a
 
 ### Security Considerations
 #### Authentication and Authorization
+- Multi-factor authentication (MFA) can be enabled from user settings.
 - User passwords are hashed using bcrypt before storage.
 - JSON Web Tokens (JWT) are used for session management, with tokens generated upon login and registration.
 - The token is stored in HTTP-only cookies to prevent access from the frontend and XSS.
