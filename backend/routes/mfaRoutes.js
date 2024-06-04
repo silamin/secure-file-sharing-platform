@@ -5,6 +5,10 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 router.post('/enable', authMiddleware, mfaController.enableMfa);
 
-router.post('/verify', authMiddleware, mfaController.verifyMfa);
+router.post('/verify', mfaController.verifyMfa);
+
+router.post('/disable', authMiddleware, mfaController.disableMfa);
+
+router.get('/check', authMiddleware, mfaController.checkMfa);
 
 module.exports = router;

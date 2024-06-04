@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/apiService';
-import Cookies from 'js-cookie';
 
 const AuthContext = createContext(false);
 
 export const AuthProvider = ({ children }) => {
-    const[isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const verifyToken = async () => {
         try {
@@ -25,13 +24,19 @@ export const AuthProvider = ({ children }) => {
 
     const handleLogin = async (credentials) => {
         try {
-            await api.post('/auth/login', credentials);
-            setIsAuthenticated(true);
+            const response = await api.post('/auth/login', credentials);
+            if (response.data.userId) {
+                return response.data.userId;
+            } else {
+                setIsAuthenticated(true);
+                return null;
+            }
         } catch (error) {
             console.error('Error logging in:', error);
             throw error;
         }
     };
+
 
     const handleRegister = async (user) => {
         try {
@@ -48,18 +53,61 @@ export const AuthProvider = ({ children }) => {
             await api.post('/auth/logout');
             setIsAuthenticated(false);
         } catch (error) {
-            console.error('Error logging user out:', error);
+            console.error('Error logging out:', error);
             throw error;
         }
     };
 
+    const enableMfa = async () => {
+        try {
+            const response = await api.post('/mfa/enable');
+            return response.data.dataUrl;
+        } catch (error) {
+            console.error('Error enabling MFA:', error);
+            throw error;
+        }
+    };
+
+    const disableMfa = async () => {
+        try {
+            await api.post('/mfa/disable');
+        } catch (error) {
+            console.error('Error disabling MFA:', error);
+            throw error;
+        }
+    };
+
+    const verifyMfa = async ({ token, userId }) => {
+        try {
+            const response = await api.post('/mfa/verify', { token, userId });
+            setIsAuthenticated(true);
+            return response.data;
+        } catch (error) {
+            console.error('Error verifying MFA:', error);
+            throw error;
+        }
+    };
+
+    const checkMfa = async () => {
+        try {
+            const response = await api.get('/mfa/check');
+            return response.data.mfaEnabled;
+        } catch (error) {
+            console.error('Error checking MFA:', error);
+            throw error;
+        }
+    };
     return (
         <AuthContext.Provider
             value={{
                 isAuthenticated,
                 handleLogin,
                 handleRegister,
-                handleLogout
+                handleLogout,
+                enableMfa,
+                disableMfa,
+                verifyMfa,
+                checkMfa
             }}
         >
             {children}

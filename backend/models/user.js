@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 6
     },
+    totpSecret: {
+        type: String,
+        default: ''
+    },
     uploadedFiles: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'File'
@@ -22,7 +26,6 @@ const userSchema = new mongoose.Schema({
 }, {
     timestamps: true // Adds createdAt and updatedAt timestamps
 });
-
 
 const User = mongoose.model('User', userSchema);
 

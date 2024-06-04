@@ -32,28 +32,32 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
-
         const user = await User.findOne({ username });
 
         if (!user) {
-            return res.status(400).send('Invalid email or password');
+            return res.status(400).json({ message: 'Invalid username or password' });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return res.status(400).send('Invalid email or password');
+            return res.status(400).json({ message: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+        const mfaEnabled = user.totpSecret !== '';
 
-        res.cookie('token', token, { httpOnly: true, secure: true });
-
-        res.status(200).send('Login successful');
+        if (!mfaEnabled) {
+            const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true, secure: true });
+            return res.status(200).json({ message: 'Login successful' });
+        }
+        res.status(200).json({ message: 'Login successful', userId: user._id });
     } catch (error) {
         console.error('Error logging in user:', error);
-        res.status(500).send('Internal server error');
+        res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
 
 exports.logout = (req, res) => {
     res.cookie('token', '', { httpOnly: true, secure: true, expires: new Date(0) });
@@ -73,7 +77,7 @@ exports.verifyToken = async (req, res) => {
         if (!user) {
             return res.status(401).send('Unauthorized');
         }
-        res.status(200).json({ user });
+        res.status(200).send('User is authorized');
     } catch (error) {
         console.error('Error verifying token:', error);
         res.status(401).send('Unauthorized');
