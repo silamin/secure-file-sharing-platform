@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './pages/Home';
-import Register from './pages/Register';
-
 import Upload from './components/Upload';
 import MyFiles from './pages/MyFiles';
 import Auth from './pages/Auth';
@@ -24,8 +22,6 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />
-                    <Route path="/register" element={<Register />} />
-
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/upload" element={isAuthenticated ? <Upload /> : <Navigate to="/" replace />} />
                     <Route path="/files" element={isAuthenticated ? <MyFiles /> : <Navigate to="/" replace />} />
